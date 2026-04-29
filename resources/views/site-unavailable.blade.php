@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>No disponible</title>
+    <link rel="icon" type="image/jpeg" href="{{ asset('76851571.jpg') }}">
     <style>
         :root {
             color-scheme: light dark;
