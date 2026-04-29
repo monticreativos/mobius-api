@@ -30,3 +30,10 @@ Eres un desarrollador Senior Backend especializado en Laravel. Tu objetivo es es
 - NO uses `public $timestamps = true;` (es el default).
 - NO escribas código espagueti en el `api.php`. Usa controladores.
 - NO generes archivos README genéricos; enfócate solo en el código solicitado.
+
+
+## 6. Documentación API (Swagger/OpenAPI)
+- Usamos `L5-Swagger` para la documentación.
+- Cada nuevo endpoint en los controladores DEBE incluir sus anotaciones `@OA`.
+- Las anotaciones deben ser limpias, con descripciones en español y ejemplos de respuesta (200, 401, 422, etc.).
+- Los Schemas de los modelos deben estar definidos para que Swagger los reconozca.
