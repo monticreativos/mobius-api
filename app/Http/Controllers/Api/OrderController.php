@@ -11,7 +11,6 @@ use App\Services\OrderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 use OpenApi\Attributes as OA;
 
 class OrderController extends Controller
@@ -142,23 +141,14 @@ class OrderController extends Controller
             new OA\Response(response: 422, description: 'El pedido no puede cancelarse por su estado actual'),
         ]
     )]
-    public function cancel(int $id): OrderResource
+    public function cancel(int $id, OrderService $orderService): OrderResource
     {
         $order = Order::query()
             ->with(['user', 'items.product'])
             ->findOrFail($id);
 
-        if ($order->status !== Order::STATUS_PENDING) {
-            // La cancelación solo aplica a pedidos pendientes para conservar consistencia de inventario y flujo.
-            throw ValidationException::withMessages([
-                'status' => 'Solo puedes cancelar pedidos en estado pending. Los pedidos completed o cancelled no permiten cancelación.',
-            ]);
-        }
+        $cancelledOrder = $orderService->cancelOrder($order);
 
-        $order->update([
-            'status' => Order::STATUS_CANCELLED,
-        ]);
-
-        return new OrderResource($order->fresh(['user', 'items.product']));
+        return new OrderResource($cancelledOrder);
     }
 }

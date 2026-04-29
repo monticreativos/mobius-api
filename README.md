@@ -97,6 +97,7 @@ composer test o php artisan test
 
 ### ✔️ Cobertura incluida
 
+* ✅ **Restauración automática de inventario en cancelaciones**
 * ✅ Validación de stock en tiempo real
 * ✅ Seguridad de acceso (CheckOrderOwner middleware)
 * ✅ Integridad transaccional (rollback automático)
@@ -128,20 +129,20 @@ tail -f storage/logs/laravel.log
 
 ### 🧩 Decisiones clave
 
-* **Service Layer (OrderService)**
-  → Lógica desacoplada de controladores
+* **Service Layer (OrderService)** → Lógica de negocio centralizada y desacoplada de los controladores para facilitar la reutilización y el testing.
 
-* **Transacciones DB**
-  → Uso de DB::transaction + lockForUpdate para evitar race conditions
+* **Transacciones DB & Concurrencia** → Uso de `DB::transaction` junto con `lockForUpdate` (Pessimistic Locking) para garantizar la integridad de los datos y evitar *race conditions* en el inventario durante compras simultáneas.
 
-* **Eventos desacoplados**
-  → OrderCreated → NotifyStockUpdate
+* **Gestión de Inventario Reactiva (Eventos)** → **Creación:** `OrderCreated` → `NotifyStockUpdate` descuenta stock al confirmar el pedido.  
+  → **Cancelación:** `OrderCancelled` → `RestoreStockOnCancellation` repone el stock automáticamente si el pedido se cancela.
 
-* **Observers de dominio**
-  → OrderItemObserver gestiona subtotales y totales
+* **Event-Driven Design (ShouldDispatchAfterCommit)** → Los eventos de stock se disparan únicamente tras el *commit* exitoso de la transacción, asegurando que el inventario solo cambie si la base de datos se actualizó correctamente.
 
-* **API Resources**
-  → JsonResource para respuestas consistentes
+* **Event Discovery & Limpieza** → Uso del descubrimiento automático de Laravel para evitar registros manuales en `AppServiceProvider`, manteniendo el código limpio y evitando ejecuciones duplicadas de listeners.
+
+* **Observers de dominio** → `OrderItemObserver` gestiona la integridad de subtotales y totales de forma automática, centralizada y reactiva a los cambios en el modelo.
+
+* **API Resources** → Capa de transformación `JsonResource` para garantizar respuestas consistentes, seguras y desacopladas de la estructura de la base de datos.
 
 ---
 
