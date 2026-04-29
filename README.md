@@ -1,58 +1,83 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Mobius API de Pedidos
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API REST construida con Laravel para gestionar autenticación, catálogo de productos y flujo de pedidos con control de stock.
 
-## About Laravel
+## Requisitos
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 8.3+
+- Composer
+- Base de datos compatible con Laravel (MySQL, PostgreSQL o SQLite)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Instalación rápida
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+1. Clonar el repositorio.
+2. Instalar dependencias:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+3. Crear archivo de entorno:
 
-## Contributing
+```bash
+cp .env.example .env
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+4. Generar clave de aplicación:
 
-## Code of Conduct
+```bash
+php artisan key:generate
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+5. Configurar la conexión a base de datos en `.env`.
+6. Ejecutar migraciones y seeders:
 
-## Security Vulnerabilities
+```bash
+php artisan migrate --seed
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+7. Levantar servidor local:
 
-## License
+```bash
+php artisan serve
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Usuario de prueba
+
+- **Email:** `admin@example.com`
+- **Password:** `password`
+
+## Documentación Swagger
+
+1. Generar documentación OpenAPI:
+
+```bash
+php artisan l5-swagger:generate
+```
+
+2. Abrir en navegador:
+
+- [`/api/documentation`](http://127.0.0.1:8000/api/documentation)
+
+> Si usas otro host/puerto, reemplaza `127.0.0.1:8000` por tu URL local.
+
+## Decisiones técnicas clave
+
+- **Transacciones (`DB::transaction`)**: evitan inconsistencias en creación de pedidos, para no dejar pedidos parciales sin stock o sin ítems válidos.
+- **Observer de `OrderItem`**: centraliza cálculo de `subtotal` y actualización de `total` del pedido para no duplicar lógica en distintos endpoints.
+- **Eventos + Listeners**: `OrderCreated` + `NotifyStockUpdate` desacoplan efectos secundarios (notificaciones/logs) de la lógica principal del controlador.
+- **Middleware de ownership**: `CheckOrderOwner` garantiza que cada usuario solo pueda consultar/cancelar sus propios pedidos.
+
+## Comandos útiles
+
+- Ejecutar tests:
+
+```bash
+php artisan test --compact
+```
+
+- Formatear código:
+
+```bash
+vendor/bin/pint --dirty --format agent
+```
