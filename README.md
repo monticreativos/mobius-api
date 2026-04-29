@@ -1,83 +1,75 @@
-# Mobius API de Pedidos
+# Mobius Order Management API
 
-API REST construida con Laravel para gestionar autenticación, catálogo de productos y flujo de pedidos con control de stock.
+API REST robusta construida con Laravel 13, enfocada en integridad de datos, seguridad y observabilidad para la gestión de pedidos, stock y autenticación de clientes.
 
-## Requisitos
+## Stack técnico
 
-- PHP 8.3+
-- Composer
-- Base de datos compatible con Laravel (MySQL, PostgreSQL o SQLite)
+- Laravel 13
+- Laravel Sanctum (autenticación por token)
+- MySQL / SQLite
+- L5-Swagger (documentación OpenAPI)
 
-## Instalación rápida
+## Instalación paso a paso
 
-1. Clonar el repositorio.
-2. Instalar dependencias:
+1) Instalar dependencias:
 
 ```bash
 composer install
 ```
 
-3. Crear archivo de entorno:
+2) Crear y configurar entorno:
 
 ```bash
 cp .env.example .env
-```
-
-4. Generar clave de aplicación:
-
-```bash
 php artisan key:generate
 ```
 
-5. Configurar la conexión a base de datos en `.env`.
-6. Ejecutar migraciones y seeders:
+3) Ejecutar migraciones y seeders:
 
 ```bash
-php artisan migrate --seed
+php artisan migrate:fresh --seed
 ```
 
-7. Levantar servidor local:
+> Este comando crea datos de prueba realistas, incluyendo 5 clientes y 30 productos.
+
+4) Levantar el servidor:
 
 ```bash
 php artisan serve
 ```
 
-## Usuario de prueba
+## Credenciales de prueba
 
-- **Email:** `admin@example.com`
-- **Password:** `password`
+- Usuario: `cliente@example.com`
+- Password: `password`
 
-## Documentación Swagger
+## Documentación y pruebas
 
-1. Generar documentación OpenAPI:
+- Swagger UI: [http://localhost:8000/api/documentation](http://localhost:8000/api/documentation)
+- Colección Postman incluida en la raíz: `Mobius.postman_collection.json`
+
+Si necesitas regenerar la documentación OpenAPI:
 
 ```bash
 php artisan l5-swagger:generate
 ```
 
-2. Abrir en navegador:
+## Decisiones de arquitectura
 
-- [`/api/documentation`](http://127.0.0.1:8000/api/documentation)
+- **Capa de servicio (`OrderService`)**: desacopla la lógica de negocio del controlador para mantener endpoints limpios y escalables.
+- **Integridad de datos**: uso de `DB::transaction` y `lockForUpdate` para prevenir inconsistencias de stock en escenarios concurrentes.
+- **Observabilidad**: sistema de logs profesional en servicios, middleware y listeners para trazabilidad operativa y alertas de seguridad.
+- **Rendimiento**: caché de 5 minutos en el catálogo (`GET /api/products`) para reducir carga y mejorar tiempos de respuesta.
+- **Eventos desacoplados**: `OrderCreated` + `NotifyStockUpdate` para separar efectos secundarios de la lógica principal del pedido.
 
-> Si usas otro host/puerto, reemplaza `127.0.0.1:8000` por tu URL local.
+## Monitoreo de logs en tiempo real
 
-## Decisiones técnicas clave
-
-- **Transacciones (`DB::transaction`)**: evitan inconsistencias en creación de pedidos, para no dejar pedidos parciales sin stock o sin ítems válidos.
-- **Observer de `OrderItem`**: centraliza cálculo de `subtotal` y actualización de `total` del pedido para no duplicar lógica en distintos endpoints.
-- **Eventos + Listeners**: `OrderCreated` + `NotifyStockUpdate` desacoplan efectos secundarios (notificaciones/logs) de la lógica principal del controlador.
-- **Middleware de ownership**: `CheckOrderOwner` garantiza que cada usuario solo pueda consultar/cancelar sus propios pedidos.
-
-## Comandos útiles
-
-- Ejecutar tests:
+Para seguir el flujo operativo en tiempo real:
 
 ```bash
-php artisan test --compact
+tail -f storage/logs/laravel.log
 ```
 
-- Formatear código:
+## Consideraciones finales
 
-```bash
-vendor/bin/pint --dirty --format agent
-```
+Se optó por un enfoque defensivo en la validación de stock, verificando tanto en el FormRequest como dentro de la transacción del servicio para garantizar que nunca existan pedidos con stock negativo, cumpliendo estrictamente los requerimientos no funcionales.

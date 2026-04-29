@@ -8,6 +8,7 @@ use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\User;
 use App\Services\OrderService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -108,14 +109,16 @@ class OrderController extends Controller
             ),
         ]
     )]
-    public function store(StoreOrderRequest $request, OrderService $orderService): OrderResource
+    public function store(StoreOrderRequest $request, OrderService $orderService): JsonResponse
     {
         /** @var User $authenticatedUser */
         $authenticatedUser = Auth::user();
         $orderItems = $request->validated('items');
         $order = $orderService->createOrderForUser($authenticatedUser, $orderItems);
 
-        return new OrderResource($order);
+        return (new OrderResource($order))
+            ->response()
+            ->setStatusCode(201);
     }
 
     #[OA\Put(

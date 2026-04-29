@@ -355,10 +355,58 @@
                     }
                 ]
             }
+        },
+        "/api/products": {
+            "get": {
+                "tags": [
+                    "Productos"
+                ],
+                "summary": "Listar catálogo de productos disponibles",
+                "operationId": "d97d1c3727cbac49708b85f7d11f7d58",
+                "responses": {
+                    "200": {
+                        "description": "Listado público del catálogo",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Product"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
         "schemas": {
+            "Product": {
+                "title": "Product",
+                "description": "Representación pública de un producto disponible en catálogo.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Laptop Pro"
+                    },
+                    "price": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1499.99
+                    },
+                    "stock": {
+                        "type": "integer",
+                        "example": 23
+                    }
+                },
+                "type": "object"
+            },
             "UserResource": {
                 "title": "UserResource",
                 "description": "Representación pública del usuario para respuestas API.",
@@ -474,6 +522,10 @@
         {
             "name": "Pedidos",
             "description": "Pedidos"
+        },
+        {
+            "name": "Productos",
+            "description": "Productos"
         }
     ]
 }

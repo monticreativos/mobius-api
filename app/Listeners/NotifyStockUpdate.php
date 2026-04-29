@@ -24,6 +24,7 @@ class NotifyStockUpdate
             ->map(fn ($orderItem): array => [
                 'product_id' => $orderItem->product_id,
                 'quantity' => $orderItem->quantity,
+                'remaining_stock' => $orderItem->product?->stock,
             ])
             ->all();
 

@@ -7,6 +7,7 @@ use Closure;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckOrderOwner
@@ -27,6 +28,11 @@ class CheckOrderOwner
             ->exists();
 
         if (! $ownsOrder) {
+            Log::warning('Intento de acceso a pedido no autorizado.', [
+                'user_id' => Auth::id(),
+                'order_id' => $orderId,
+            ]);
+
             throw (new ModelNotFoundException())->setModel(Order::class, [$orderId]);
         }
 

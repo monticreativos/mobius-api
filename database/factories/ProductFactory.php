@@ -18,7 +18,7 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->unique()->randomElement([
+            'name' => fake()->randomElement([
                 'Laptop Pro',
                 'Teclado Mecánico',
                 'Mouse Inalámbrico',
@@ -31,7 +31,15 @@ class ProductFactory extends Factory
                 'Tablet Air',
                 'Smartphone Plus',
                 'Impresora Láser',
-            ]),
+                'Router WiFi 6',
+                'Smartwatch Active',
+                'Microfono Condensador',
+                'Altavoces Estudio',
+                'Hub USB Inteligente',
+                'Power Bank 20000mAh',
+                'Cargador GaN 100W',
+                'Camara Deportiva 4K',
+            ]).' '.fake()->unique()->numberBetween(100, 999),
             'price' => fake()->randomFloat(2, 19.99, 2499.99),
             'stock' => fake()->numberBetween(5, 150),
         ];
