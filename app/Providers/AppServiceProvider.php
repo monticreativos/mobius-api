@@ -2,12 +2,9 @@
 
 namespace App\Providers;
 
-use App\Events\OrderCreated;
-use App\Listeners\NotifyStockUpdate;
 use App\Models\OrderItem;
 use App\Observers\OrderItemObserver;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -32,7 +29,6 @@ class AppServiceProvider extends ServiceProvider
         // - creating: calcula subtotal antes de persistir.
         // - created: recalcula total del pedido para centralizar la regla.
         OrderItem::observe(OrderItemObserver::class);
-        // El listener reacciona al evento de pedido creado para trazabilidad de stock.
-        Event::listen(OrderCreated::class, NotifyStockUpdate::class);
+        // Los listeners en app/Listeners se registran vía descubrimiento de eventos (withEvents() en bootstrap).
     }
 }

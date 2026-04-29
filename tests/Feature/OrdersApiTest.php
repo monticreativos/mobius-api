@@ -106,6 +106,36 @@ it('no permite ver pedido de otro usuario', function (): void {
         ->assertNotFound();
 });
 
+it('restaura stock al cancelar un pedido pendiente', function (): void {
+    $user = User::factory()->create();
+    $product = Product::factory()->create([
+        'stock' => 10,
+    ]);
+
+    Sanctum::actingAs($user);
+
+    $this->postJson('/api/orders', [
+        'items' => [
+            [
+                'product_id' => $product->id,
+                'quantity' => 4,
+            ],
+        ],
+    ])->assertSuccessful();
+
+    $this->assertDatabaseCount('order_items', 1);
+
+    expect($product->fresh()->stock)->toBe(6);
+
+    $orderId = Order::query()->where('user_id', $user->id)->value('id');
+
+    $this->putJson('/api/orders/'.$orderId.'/cancel')
+        ->assertSuccessful()
+        ->assertJsonPath('status', Order::STATUS_CANCELLED);
+
+    expect($product->fresh()->stock)->toBe(10);
+});
+
 it('cancela pedido pendiente del propietario', function (): void {
     $user = User::factory()->create();
     $order = Order::query()->create([

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\OrderCancelled;
 use App\Events\OrderCreated;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -56,5 +57,29 @@ class OrderService
         OrderCreated::dispatch($order->loadMissing('items.product'));
 
         return $order;
+    }
+
+    /**
+     * Cancela un pedido pendiente y dispara la restauración de stock en la misma transacción.
+     */
+    public function cancelOrder(Order $order): Order
+    {
+        if ($order->status !== Order::STATUS_PENDING) {
+            throw ValidationException::withMessages([
+                'status' => 'Solo puedes cancelar pedidos en estado pending. Los pedidos completed o cancelled no permiten cancelación.',
+            ]);
+        }
+
+        return DB::transaction(function () use ($order): Order {
+            $order->update([
+                'status' => Order::STATUS_CANCELLED,
+            ]);
+
+            $order->loadMissing(['items.product']);
+
+            OrderCancelled::dispatch($order);
+
+            return $order->fresh(['user', 'items.product']);
+        });
     }
 }
