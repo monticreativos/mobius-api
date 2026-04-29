@@ -9,19 +9,17 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     schema: 'Product',
     title: 'Product',
-    description: 'Representación pública de un producto disponible en catálogo.',
+    description: 'Producto del catálogo con precio y stock actuales.',
     properties: [
         new OA\Property(property: 'id', type: 'integer', example: 1),
         new OA\Property(property: 'name', type: 'string', example: 'Laptop Pro'),
-        new OA\Property(property: 'price', type: 'number', format: 'float', example: 1499.99),
-        new OA\Property(property: 'stock', type: 'integer', example: 23),
+        new OA\Property(property: 'price', type: 'number', format: 'float', example: 99.9),
+        new OA\Property(property: 'stock', type: 'integer', example: 10),
     ]
 )]
 class ProductResource extends JsonResource
 {
     /**
-     * Transform the resource into an array.
-     *
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array

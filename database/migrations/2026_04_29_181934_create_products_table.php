@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Catálogo e inventario: precio mostrado y unidades disponibles para validar pedidos.
      */
     public function up(): void
     {
@@ -15,13 +15,14 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->decimal('price', 10, 2);
+            // Entero no negativo coherente con descuentos atómicos en el servicio de pedidos.
             $table->unsignedInteger('stock');
             $table->timestamps();
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Elimina la tabla de productos.
      */
     public function down(): void
     {

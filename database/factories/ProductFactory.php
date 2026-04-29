@@ -11,14 +11,15 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class ProductFactory extends Factory
 {
     /**
-     * Define the model's default state.
+     * Estado base para tests y seed: datos realistas y sin colisiones de nombre.
      *
      * @return array<string, mixed>
      */
     public function definition(): array
     {
         return [
-            'name' => fake()->randomElement([
+            // Nombres fijos + unique() evitan duplicados al sembrar muchas filas en un mismo test.
+            'name' => fake()->unique()->randomElement([
                 'Laptop Pro',
                 'Teclado Mecánico',
                 'Mouse Inalámbrico',
@@ -31,16 +32,10 @@ class ProductFactory extends Factory
                 'Tablet Air',
                 'Smartphone Plus',
                 'Impresora Láser',
-                'Router WiFi 6',
-                'Smartwatch Active',
-                'Microfono Condensador',
-                'Altavoces Estudio',
-                'Hub USB Inteligente',
-                'Power Bank 20000mAh',
-                'Cargador GaN 100W',
-                'Camara Deportiva 4K',
-            ]).' '.fake()->unique()->numberBetween(100, 999),
+            ]),
+            // 2 decimales alineados con el cast decimal:2 del modelo.
             'price' => fake()->randomFloat(2, 19.99, 2499.99),
+            // Rango acotado para que los escenarios de stock bajo/ok sigan siendo manejables en pruebas.
             'stock' => fake()->numberBetween(5, 150),
         ];
     }

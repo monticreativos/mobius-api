@@ -31,10 +31,15 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $casts = [
+        // Permite tratar la verificación como fecha Carbon dentro del dominio.
         'email_verified_at' => 'datetime',
+        // Garantiza hashing automático ante asignaciones directas del atributo.
         'password' => 'hashed',
     ];
 
+    /**
+     * Pedidos asociados al usuario autenticado.
+     */
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);

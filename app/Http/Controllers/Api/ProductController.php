@@ -5,35 +5,36 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use OpenApi\Attributes as OA;
 
 class ProductController extends Controller
 {
+    /**
+     * Catálogo público: el cliente arma el carrito con `product_id` al crear el pedido.
+     */
     #[OA\Get(
         path: '/api/products',
         tags: ['Productos'],
-        summary: 'Listar catálogo de productos disponibles',
+        summary: 'Listar productos',
+        description: 'Devuelve el catálogo con precio y stock actual (sin autenticación).',
         responses: [
             new OA\Response(
                 response: 200,
-                description: 'Listado público del catálogo',
-                content: new OA\JsonContent(type: 'array', items: new OA\Items(ref: '#/components/schemas/Product'))
+                description: 'Listado de productos',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(ref: '#/components/schemas/Product')
+                )
             ),
         ]
     )]
-    public function index(): JsonResponse
+    public function index(): AnonymousResourceCollection
     {
-        // Cacheamos el catálogo porque cambia mucho menos que los pedidos y así mejoramos el tiempo de respuesta.
-        $productsPayload = Cache::remember('catalog.products.index', now()->addMinutes(5), function (): array {
-            return ProductResource::collection(
-                Product::query()
-                    ->orderBy('name')
-                    ->get()
-            )->resolve();
-        });
+        $products = Product::query()
+            ->orderBy('id')
+            ->get();
 
-        return response()->json($productsPayload);
+        return ProductResource::collection($products);
     }
 }

@@ -361,11 +361,12 @@
                 "tags": [
                     "Productos"
                 ],
-                "summary": "Listar catálogo de productos disponibles",
+                "summary": "Listar productos",
+                "description": "Devuelve el catálogo con precio y stock actual (sin autenticación).",
                 "operationId": "d97d1c3727cbac49708b85f7d11f7d58",
                 "responses": {
                     "200": {
-                        "description": "Listado público del catálogo",
+                        "description": "Listado de productos",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -385,7 +386,7 @@
         "schemas": {
             "Product": {
                 "title": "Product",
-                "description": "Representación pública de un producto disponible en catálogo.",
+                "description": "Producto del catálogo con precio y stock actuales.",
                 "properties": {
                     "id": {
                         "type": "integer",
@@ -398,11 +399,11 @@
                     "price": {
                         "type": "number",
                         "format": "float",
-                        "example": 1499.99
+                        "example": 99.9
                     },
                     "stock": {
                         "type": "integer",
-                        "example": 23
+                        "example": 10
                     }
                 },
                 "type": "object"

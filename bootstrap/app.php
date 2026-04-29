@@ -8,7 +8,6 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -23,59 +22,37 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->shouldRenderJsonWhen(function (Request $request, \Throwable $exception): bool {
-            return $request->is('api/*') || $request->expectsJson() || $request->wantsJson();
-        });
-
-        $exceptions->render(function (AuthenticationException $exception, Request $request) {
+        // Respuestas JSON seguras para la API: nunca exponemos traza, rutas de archivo ni detalle interno de Laravel.
+        $exceptions->render(function (Throwable $e, Request $request) {
             if (! $request->is('api/*')) {
                 return null;
             }
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'No autenticado.',
-            ], 401);
-        });
-
-        $exceptions->render(function (NotFoundHttpException $exception, Request $request) {
-            if (! $request->is('api/*')) {
+            // Mantener el formato habitual de validación (422).
+            if ($e instanceof ValidationException) {
                 return null;
             }
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Recurso no encontrado.',
-            ], 404);
-        });
-
-        $exceptions->render(function (ValidationException $exception, Request $request) {
-            if (! $request->is('api/*')) {
+            // Sanctum / auth ya devuelven JSON breve.
+            if ($e instanceof AuthenticationException) {
                 return null;
             }
 
-            return response()->json([
-                'status' => 'error',
-                'message' => $exception->getMessage() !== '' ? $exception->getMessage() : 'Error de validación.',
-            ], 422);
-        });
+            if ($e instanceof HttpExceptionInterface) {
+                $status = $e->getStatusCode();
+                $message = match (true) {
+                    $status === 404 => 'No encontrado.',
+                    $status === 403 => 'No autorizado.',
+                    $status === 429 => 'Demasiadas peticiones.',
+                    $status >= 500 => 'Error interno del servidor.',
+                    default => 'Solicitud incorrecta.',
+                };
 
-        $exceptions->render(function (\Throwable $exception, Request $request) {
-            if (! $request->is('api/*')) {
-                return null;
+                return response()->json(['message' => $message], $status);
             }
 
-            $statusCode = $exception instanceof HttpExceptionInterface
-                ? $exception->getStatusCode()
-                : 500;
-
-            $message = $statusCode >= 500
-                ? 'Error interno del servidor'
-                : ($exception->getMessage() !== '' ? $exception->getMessage() : 'Error en la solicitud.');
-
             return response()->json([
-                'status' => 'error',
-                'message' => $message,
-            ], $statusCode);
+                'message' => 'Error interno del servidor.',
+            ], 500);
         });
     })->create();

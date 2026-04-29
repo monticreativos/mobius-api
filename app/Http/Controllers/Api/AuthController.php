@@ -69,7 +69,8 @@ class AuthController extends Controller
             'password' => Hash::make($request->string('password')->toString()),
         ]);
 
-        // Usamos Sanctum por su ligereza para autenticación de APIs en apps SPA y Mobile.
+        // Emitimos el token inmediatamente para evitar un segundo roundtrip de login
+        // tras el registro (flujo común en SPA y apps móviles).
         $accessToken = $newUser->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -119,6 +120,7 @@ class AuthController extends Controller
     {
         $credentials = $request->only(['email', 'password']);
 
+        // Respondemos 422 para mantener el contrato de errores de validación del API.
         if (! Auth::attempt($credentials)) {
             return response()->json([
                 'message' => 'Las credenciales ingresadas no son válidas.',

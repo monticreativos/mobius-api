@@ -13,12 +13,12 @@ use Illuminate\Support\Str;
 class UserFactory extends Factory
 {
     /**
-     * The current password being used by the factory.
+     * Hash de contraseña reutilizado entre instancias para no repetir `Hash::make` en tests masivos.
      */
     protected static ?string $password;
 
     /**
-     * Define the model's default state.
+     * Estado base para tests y seed: usuario verificado y credenciales conocidas.
      *
      * @return array<string, mixed>
      */
@@ -26,15 +26,18 @@ class UserFactory extends Factory
     {
         return [
             'name' => fake()->name(),
+            // Emails únicos evitan violaciones de índice al crear muchos usuarios seguidos.
             'email' => fake()->unique()->safeEmail(),
+            // Por defecto verificado para simplificar flujos que exigen email confirmado.
             'email_verified_at' => now(),
+            // Alineado con el cast `hashed` del modelo; cacheamos el hash por rendimiento en datasets grandes.
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
         ];
     }
 
     /**
-     * Indicate that the model's email address should be unverified.
+     * Usuario con email no verificado (registro, middleware `verified`, etc.).
      */
     public function unverified(): static
     {

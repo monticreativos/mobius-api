@@ -28,10 +28,19 @@ class Order extends Model
 {
     use HasFactory;
 
+    /**
+     * Estado inicial al crear el pedido, previo a confirmación/finalización.
+     */
     public const STATUS_PENDING = 'pending';
 
+    /**
+     * Estado final cuando el pedido fue procesado correctamente.
+     */
     public const STATUS_COMPLETED = 'completed';
 
+    /**
+     * Estado final cuando el pedido fue anulado por usuario o sistema.
+     */
     public const STATUS_CANCELLED = 'cancelled';
 
     protected $fillable = [
@@ -42,14 +51,21 @@ class Order extends Model
 
     protected $casts = [
         'user_id' => 'integer',
+        // Guardamos y serializamos el total con 2 decimales para consistencia monetaria.
         'total' => 'decimal:2',
     ];
 
+    /**
+     * Usuario propietario del pedido.
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Ítems que componen el pedido y su desglose de productos.
+     */
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
