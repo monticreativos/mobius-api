@@ -5,7 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use OpenApi\Attributes as OA;
 
+#[OA\Schema(
+    schema: 'OrderItem',
+    title: 'OrderItem',
+    description: 'Ítem de un pedido con snapshot de precios.',
+    properties: [
+        new OA\Property(property: 'id', type: 'integer', example: 100),
+        new OA\Property(property: 'order_id', type: 'integer', example: 10),
+        new OA\Property(property: 'quantity', type: 'integer', example: 2),
+        new OA\Property(property: 'unit_price', type: 'number', format: 'float', example: 49.95),
+        new OA\Property(property: 'subtotal', type: 'number', format: 'float', example: 99.9),
+    ]
+)]
 class OrderItem extends Model
 {
     use HasFactory;

@@ -10,5 +10,6 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/orders', [OrderController::class, 'store']);
     Route::get('/orders', [OrderController::class, 'index']);
-    Route::get('/orders/{id}', [OrderController::class, 'show']);
+    Route::get('/orders/{id}', [OrderController::class, 'show'])->middleware('order.owner');
+    Route::put('/orders/{id}/cancel', [OrderController::class, 'cancel'])->middleware('order.owner');
 });

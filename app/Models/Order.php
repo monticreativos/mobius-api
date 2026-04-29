@@ -6,7 +6,24 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
+use OpenApi\Attributes as OA;
 
+#[OA\Schema(
+    schema: 'Order',
+    title: 'Order',
+    description: 'Representa un pedido del usuario autenticado.',
+    properties: [
+        new OA\Property(property: 'id', type: 'integer', example: 10),
+        new OA\Property(property: 'status', type: 'string', example: 'pending'),
+        new OA\Property(property: 'total', type: 'number', format: 'float', example: 149.9),
+        new OA\Property(property: 'user', ref: '#/components/schemas/UserResource'),
+        new OA\Property(
+            property: 'items',
+            type: 'array',
+            items: new OA\Items(ref: '#/components/schemas/OrderItem')
+        ),
+    ]
+)]
 class Order extends Model
 {
     use HasFactory;

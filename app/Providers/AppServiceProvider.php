@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Events\OrderCreated;
+use App\Listeners\NotifyStockUpdate;
 use App\Models\OrderItem;
 use App\Observers\OrderItemObserver;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,5 +25,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         OrderItem::observe(OrderItemObserver::class);
+        Event::listen(OrderCreated::class, NotifyStockUpdate::class);
     }
 }
