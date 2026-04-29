@@ -1,7 +1,7 @@
 <?php
 
-test('the application returns a successful response', function () {
+test('la ruta raiz devuelve 404 sin exponer tecnologia', function () {
     $response = $this->get('/');
 
-    $response->assertStatus(200);
+    $response->assertNotFound();
 });
