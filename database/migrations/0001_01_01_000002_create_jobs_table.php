@@ -7,12 +7,13 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Infraestructura de colas con driver `database`: jobs, lotes y fallos para reprocesar o auditar.
      */
     public function up(): void
     {
         Schema::create('jobs', function (Blueprint $table) {
             $table->id();
+            // Filtra workers por nombre de cola sin escanear toda la tabla.
             $table->string('queue')->index();
             $table->longText('payload');
             $table->unsignedSmallInteger('attempts');
@@ -46,7 +47,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Quita tablas de cola y registro de trabajos fallidos.
      */
     public function down(): void
     {

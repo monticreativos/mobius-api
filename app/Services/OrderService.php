@@ -12,6 +12,9 @@ use Illuminate\Validation\ValidationException;
 
 class OrderService
 {
+    /**
+     * Crea un pedido para el usuario autenticado y descuenta stock de forma atómica.
+     */
     public function createOrderForUser(User $authenticatedUser, array $orderItems): Order
     {
         // Encapsulamos la transacción para garantizar consistencia y evitar pedidos fantasma en cualquier punto de entrada.
@@ -24,6 +27,7 @@ class OrderService
 
             foreach ($orderItems as $requestedItem) {
                 $product = Product::query()
+                    // Bloqueo pesimista para evitar sobreventa en compras concurrentes.
                     ->lockForUpdate()
                     ->findOrFail((int) $requestedItem['product_id']);
 
@@ -48,6 +52,7 @@ class OrderService
             return $newOrder->fresh(['user', 'items.product']);
         });
 
+        // Disparamos efectos secundarios fuera de la transacción una vez confirmado el commit.
         OrderCreated::dispatch($order->loadMissing('items.product'));
 
         return $order;

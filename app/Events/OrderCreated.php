@@ -12,9 +12,14 @@ class OrderCreated
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * Create a new event instance.
+     * Pedido recién creado que dispara efectos secundarios
+     * (por ejemplo, actualización de stock o notificaciones).
      */
-    public function __construct(public Order $order)
-    {
+    public function __construct(
+        /**
+         * Entidad del pedido creada y disponible para los listeners.
+         */
+        public Order $order
+    ) {
     }
 }

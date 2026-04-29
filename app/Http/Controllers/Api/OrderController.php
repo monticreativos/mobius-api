@@ -35,6 +35,7 @@ class OrderController extends Controller
         $authenticatedUser = Auth::user();
 
         $orders = Order::query()
+            // Eager loading para evitar N+1 al serializar usuario, items y producto.
             ->whereBelongsTo($authenticatedUser)
             ->with(['user', 'items.product'])
             ->latest('id')
@@ -112,6 +113,7 @@ class OrderController extends Controller
     {
         /** @var User $authenticatedUser */
         $authenticatedUser = Auth::user();
+        // Usamos únicamente la carga validada para proteger la creación del pedido.
         $orderItems = $request->validated('items');
         $order = $orderService->createOrderForUser($authenticatedUser, $orderItems);
 
@@ -144,6 +146,7 @@ class OrderController extends Controller
             ->findOrFail($id);
 
         if ($order->status !== Order::STATUS_PENDING) {
+            // La cancelación solo aplica a pedidos pendientes para conservar consistencia de inventario y flujo.
             throw ValidationException::withMessages([
                 'status' => 'Solo puedes cancelar pedidos en estado pending. Los pedidos completed o cancelled no permiten cancelación.',
             ]);

@@ -16,13 +16,17 @@ class Product extends Model
     ];
 
     protected $casts = [
+        // Normalizamos el precio para cálculos y respuestas monetarias consistentes.
         'price' => 'decimal:2',
         'stock' => 'integer',
     ];
 
+    /**
+     * Verifica disponibilidad antes de intentar crear/cerrar un pedido
+     * y así cortar el flujo temprano cuando el stock es insuficiente.
+     */
     public function hasStock(int $quantity): bool
     {
-        // Validación de seguridad previa para evitar procesar una orden imposible antes de la transacción.
         return $this->stock >= $quantity;
     }
 }

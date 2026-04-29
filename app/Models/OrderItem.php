@@ -23,7 +23,10 @@ class OrderItem extends Model
 {
     use HasFactory;
 
-    // Persistimos precio unitario y subtotal para conservar el histórico real aunque el producto cambie su precio luego.
+    /**
+     * Persistimos precio unitario y subtotal para conservar el histórico real
+     * aunque el producto cambie su precio después de generar el pedido.
+     */
     protected $fillable = [
         'order_id',
         'product_id',
@@ -36,15 +39,22 @@ class OrderItem extends Model
         'order_id' => 'integer',
         'product_id' => 'integer',
         'quantity' => 'integer',
+        // Valores monetarios normalizados para cálculo y serialización consistentes.
         'unit_price' => 'decimal:2',
         'subtotal' => 'decimal:2',
     ];
 
+    /**
+     * Pedido al que pertenece este ítem.
+     */
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
+    /**
+     * Producto asociado al ítem al momento de la compra.
+     */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);

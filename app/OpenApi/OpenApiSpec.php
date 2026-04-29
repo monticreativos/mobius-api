@@ -15,6 +15,9 @@ use OpenApi\Attributes as OA;
     scheme: 'bearer',
     bearerFormat: 'Token'
 )]
+/**
+ * Punto único de metadatos globales para la especificación OpenAPI.
+ */
 final class OpenApiSpec
 {
 }

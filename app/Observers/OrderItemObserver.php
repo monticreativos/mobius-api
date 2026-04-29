@@ -7,15 +7,16 @@ use App\Models\OrderItem;
 class OrderItemObserver
 {
     /**
-     * Handle the OrderItem "creating" event.
+     * Antes de persistir el ítem calculamos el subtotal como snapshot monetario.
      */
     public function creating(OrderItem $orderItem): void
     {
+        // Evita depender del cliente para un valor derivado crítico.
         $orderItem->subtotal = (float) $orderItem->quantity * (float) $orderItem->unit_price;
     }
 
     /**
-     * Handle the OrderItem "created" event.
+     * Tras crear el ítem, recalculamos el total del pedido asociado.
      */
     public function created(OrderItem $orderItem): void
     {
