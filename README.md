@@ -1,135 +1,204 @@
-# Mobius Order Management API
+# 📦 Mobius Order Management API
 
-API REST robusta para gestión de pedidos y stock, construida con foco en integridad transaccional, seguridad de acceso y observabilidad operativa.
+<p align="center">
+  <img src="https://laravel.com/img/logomark.min.svg" width="100" alt="Laravel Logo">
+</p>
 
-## Stack técnico
+<p align="center">
+  <img src="https://img.shields.io/badge/Laravel-Framework-FF2D20?style=for-the-badge&logo=laravel" alt="Laravel">
+  <img src="https://img.shields.io/badge/PHP-8.3-777BB4?style=for-the-badge&logo=php" alt="PHP Version">
+  <img src="https://img.shields.io/badge/Testing-Pest-00B1E1?style=for-the-badge" alt="Pest Testing">
+  <img src="https://img.shields.io/badge/Code%20Style-Laravel%20Pint-ff2d20?style=for-the-badge" alt="Laravel Pint">
+</p>
 
-- PHP 8.3
-- Laravel 13.0
-- Laravel Sanctum para autenticación por tokens
-- MySQL / SQLite
-- L5-Swagger para documentación OpenAPI
-- Pest PHP (v4.6+) para testing
+---
 
-## Instalación
+## 🧾 Descripción
 
-1. Instalar dependencias:
+API REST robusta para la gestión de pedidos y stock, diseñada con un enfoque en:
 
-```bash
+* 🔒 **Seguridad de acceso**
+* 🔁 **Integridad transaccional**
+* 📊 **Observabilidad operativa**
+
+---
+
+## 🚀 Stack Técnico
+
+* ⚙️ **Runtime:** PHP 8.3 + Laravel 13
+* 🔐 **Autenticación:** Laravel Sanctum (tokens)
+* 🗄️ **Base de datos:** MySQL / SQLite
+* 📄 **Documentación:** L5-Swagger (OpenAPI 3)
+* 🧪 **Testing:** Pest PHP (v4.6+)
+* 🧹 **Code Quality:** Laravel Pint
+
+---
+
+## 🛠️ Instalación y Setup
+
+### ⚡ Instalación automática (recomendada)
+
+composer run setup
+
+### 🔧 Instalación manual
+
 composer install
-```
-
-2. Crear entorno y generar clave:
-
-```bash
 cp .env.example .env
 php artisan key:generate
-```
-
-3. Levantar base con datos de prueba:
-
-```bash
 php artisan migrate:fresh --seed
-```
-
-Este seed crea una base evaluable desde el primer momento con:
-
-- 1 usuario administrador demo
-- 10 productos de ejemplo
-
-4. Levantar servidor:
-
-```bash
 php artisan serve
-```
 
-## Credenciales de prueba
+---
 
-- Usuario: `admin@example.com`
-- Password: `password`
+## ⚠️ Nota Importante
 
-## Documentación y pruebas de API
+El **Seeder Maestro** genera:
 
-- Swagger UI: [http://localhost:8000/api/documentation](http://localhost:8000/api/documentation)
-- Colección Postman incluida en raíz: `Mobius.postman_collection.json`
+* 👤 5 clientes de prueba
+* 📦 30 productos con distintos estados:
 
-Para regenerar docs:
+  * Agotados
+  * Stock limitado
+  * Stock normal
 
-```bash
-php artisan l5-swagger:generate
-```
+Ideal para probar validaciones reales y edge cases.
 
-o con Composer:
+---
 
-```bash
-composer swagger
-```
+## 🔐 Credenciales de Prueba
 
-Si no aparece un endpoint nuevo en Swagger UI, regenera y recarga el navegador (Ctrl+F5).
+Usuario: [cliente@example.com](mailto:cliente@example.com)
+Password: password
 
-## Testing
+---
 
-El proyecto utiliza Pest PHP (v4.6+) como framework de pruebas.
+## 📖 Documentación de API
 
-Comandos:
+* 🌐 Swagger UI:
+  http://localhost:8000/api/documentation
 
-```bash
-php artisan test
-```
+* 📬 Postman:
+  Archivo incluido → `Mobius.postman_collection.json`
 
-o
+### 🔄 Regenerar documentación
 
-```bash
-composer test
-```
+php artisan l5-swagger:generate o composer swagger
 
-Cobertura funcional clave:
+💡 **Tip:**
+Si no ves cambios en Swagger → Ctrl + F5 para limpiar caché.
 
-- Validación de stock
-- Middleware de seguridad `CheckOrderOwner`
-- Integridad de transacciones en creación de pedidos
-- Flujo de autenticación de API
-- Respuesta corta de errores en `api/*` (sin `trace`, `file`, `exception`)
-- Listado público de productos (`GET /api/products`)
+---
 
-## Observabilidad
+## 🧪 Testing (Pest PHP)
 
-El sistema registra eventos relevantes en:
+Ejecutar tests:
 
-```bash
+composer test o php artisan test
+
+### ✔️ Cobertura incluida
+
+* ✅ Validación de stock en tiempo real
+* ✅ Seguridad de acceso (CheckOrderOwner middleware)
+* ✅ Integridad transaccional (rollback automático)
+* ✅ Flujo completo de autenticación
+* ✅ Manejo de errores limpio (sin fugas internas)
+* ✅ Cache y listado público de catálogo
+
+---
+
+## 👁️ Observabilidad (Logs)
+
+Ubicación:
+
 storage/logs/laravel.log
-```
 
-Se registran, entre otros:
+### 🔍 Eventos registrados
 
-- Intentos de acceso no autorizado (middleware)
-- Flujo de creación transaccional de pedidos (servicio)
-- Actualizaciones de stock posteriores a la creación (listeners)
+* 🛡️ Intentos de acceso no autorizado
+* 📦 Creación de pedidos paso a paso
+* 📉 Actualización de stock
 
-Monitoreo en tiempo real:
+### 📡 Monitoreo en tiempo real
 
-```bash
 tail -f storage/logs/laravel.log
-```
 
-## Scripts de Composer
+---
 
-Scripts útiles:
+## 🏗️ Arquitectura
 
-- `composer setup`: automatiza instalación inicial (dependencias, entorno y pasos base).
-- `composer test`: ejecuta pruebas.
-- `composer swagger`: regenera documentación OpenAPI.
+### 🧩 Decisiones clave
 
-## Decisiones de arquitectura
+* **Service Layer (OrderService)**
+  → Lógica desacoplada de controladores
 
-- **Capa de servicio**: `OrderService` desacopla lógica de negocio del controlador.
-- **Integridad de datos**: `DB::transaction` + `lockForUpdate` para escenarios concurrentes.
-- **Eventos desacoplados**: `OrderCreated` y `NotifyStockUpdate` para efectos secundarios.
-- **Observers de dominio**: `OrderItemObserver` centraliza cálculo de subtotal y recálculo de total.
-- **Recursos API**: respuestas consistentes mediante `JsonResource`.
+* **Transacciones DB**
+  → Uso de DB::transaction + lockForUpdate para evitar race conditions
 
-## Consideraciones de seguridad
+* **Eventos desacoplados**
+  → OrderCreated → NotifyStockUpdate
 
-La API está blindada para responder en JSON bajo rutas `api/*`, incluyendo errores de autenticación (`401`), validación (`422`) y no encontrado (`404`). Para errores inesperados se devuelve un `500` con mensaje corto, sin exponer traza, archivo ni detalles internos del framework.
+* **Observers de dominio**
+  → OrderItemObserver gestiona subtotales y totales
 
-Este proyecto fue desarrollado siguiendo principios SOLID y Clean Code, priorizando la integridad de los datos y la claridad del contrato API.
+* **API Resources**
+  → JsonResource para respuestas consistentes
+
+---
+
+## 🛡️ Seguridad
+
+La API responde exclusivamente en JSON bajo `/api/*`.
+
+### Manejo de errores
+
+* 401 → Token inválido o ausente
+* 404 → Recurso no encontrado
+* 422 → Error de validación o stock
+* 500 → Error interno sin exponer detalles
+
+✔️ Sin exposición de:
+
+* trace
+* file
+* detalles internos del framework
+
+---
+
+## 🧰 Scripts útiles (Composer)
+
+composer setup     → Instalación completa automática
+composer test      → Ejecutar tests
+composer swagger   → Generar documentación OpenAPI
+composer lint      → Analizar estilo de código (Pint)
+
+---
+
+## 📌 Filosofía del Proyecto
+
+Este proyecto demuestra:
+
+* Buenas prácticas en Laravel moderno
+* Arquitectura limpia y escalable
+* Manejo realista de concurrencia
+* APIs seguras y observables
+
+---
+
+## 🤝 Contribución
+
+1. Fork del repositorio
+2. Crear branch (feature/nueva-feature)
+3. Commit de cambios
+4. Pull Request 🚀
+
+---
+
+## 📄 Licencia
+
+Este proyecto está bajo licencia MIT.
+
+---
+
+<p align="center">
+  Hecho con ❤️ usando Laravel
+</p>
