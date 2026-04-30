@@ -9,7 +9,8 @@ use Illuminate\Validation\Rule;
 class StoreOrderRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Permitimos crear pedidos a usuarios autenticados; la pertenencia
+     * y permisos finos se validan en middleware/policies.
      */
     public function authorize(): bool
     {
@@ -24,8 +25,11 @@ class StoreOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
+            // Forzamos al menos un ítem para evitar órdenes vacías.
             'items' => ['required', 'array', 'min:1'],
+            // Confirmamos que cada producto exista antes de procesar stock o totales.
             'items.*.product_id' => ['required', 'integer', Rule::exists('products', 'id')],
+            // Evitamos cantidades inválidas que rompan inventario o cálculos.
             'items.*.quantity' => ['required', 'integer', 'min:1'],
         ];
     }

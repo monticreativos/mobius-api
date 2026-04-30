@@ -10,7 +10,8 @@ use Illuminate\Validation\Rules\Password;
 class RegisterRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Permitimos registro abierto; las restricciones de acceso
+     * se manejan en otras capas si el negocio lo requiere.
      */
     public function authorize(): bool
     {
@@ -25,8 +26,11 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
+            // Limitamos longitud para proteger consistencia de datos y UI.
             'name' => ['required', 'string', 'max:255'],
+            // La unicidad evita cuentas duplicadas con el mismo correo.
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')],
+            // Exigimos confirmación y mínimo razonable para elevar seguridad base.
             'password' => ['required', 'confirmed', Password::min(8)],
         ];
     }

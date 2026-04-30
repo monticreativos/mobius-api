@@ -120,12 +120,12 @@
                                     "email": {
                                         "type": "string",
                                         "format": "email",
-                                        "example": "diego@mobius.dev"
+                                        "example": "cliente@example.com"
                                     },
                                     "password": {
                                         "type": "string",
                                         "format": "password",
-                                        "example": "secret123"
+                                        "example": "password"
                                     }
                                 },
                                 "type": "object"

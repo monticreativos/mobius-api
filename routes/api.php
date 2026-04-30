@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 // Rutas públicas de autenticación (token Sanctum tras registro/login).
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::get('/products', [ProductController::class, 'index']);
+//Route::get('/products', [ProductController::class, 'index']);
 
 // Catálogo: necesario para elegir `product_id` al crear un pedido.
 Route::get('/products', [ProductController::class, 'index']);

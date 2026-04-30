@@ -8,7 +8,8 @@ use Illuminate\Foundation\Http\FormRequest;
 class LoginRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Permitimos esta solicitud porque el control real ocurre
+     * al validar las credenciales dentro del flujo de autenticación.
      */
     public function authorize(): bool
     {
@@ -23,7 +24,9 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
+            // Validamos formato básico para evitar intentos con correos malformados.
             'email' => ['required', 'email'],
+            // Pedimos texto plano aquí; la verificación de hash ocurre al autenticar.
             'password' => ['required', 'string'],
         ];
     }

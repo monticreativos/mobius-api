@@ -31,10 +31,12 @@ class ProductController extends Controller
     )]
     public function index(): AnonymousResourceCollection
     {
+        // En caso de que implementemos un sistema de paginado que usariamos paginate() en vez de get()
         $products = Product::query()
             ->orderBy('id')
             ->get();
 
+        // return ProductResource::collection($products->paginate(15));
         return ProductResource::collection($products);
     }
 }
